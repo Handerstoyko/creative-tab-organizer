@@ -1,0 +1,45 @@
+name: Bootstrap build Creative Tab Organizer
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Restore project sources
+        run: |
+          mkdir -p /tmp/creative-tab-organizer
+          base64 --decode creative-tab-organizer.tar.gz.b64 | tar -xz -C /tmp/creative-tab-organizer
+          cp -a /tmp/creative-tab-organizer/creative-tab-organizer/. .
+          rm -f creative-tab-organizer.tar.gz.b64
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.10.2'
+
+      - name: Build mod
+        run: gradle --no-daemon clean build
+
+      - name: Upload mod JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: CreativeTabOrganizer-1.0.0
+          path: build/libs/*.jar
+          if-no-files-found: error
+          retention-days: 14
