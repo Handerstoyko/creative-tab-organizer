@@ -29,33 +29,38 @@ jobs:
           sed -i '/"refmap":/d' src/main/resources/taborganizer.mixins.json
           python3 - <<'PY'
           from pathlib import Path
-          p = Path("src/main/java/com/example/taborganizer/client/gui/OrganizerScreen.java")
-          source = p.read_text()
-          anchor = """    @Override
-              public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-                  this.renderBackground(graphics, mouseX, mouseY, partialTick);
-          """
-          patched = """    @Override
-              public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-                  // This editor must not use Screen's default blurred-menu background.
-                  graphics.fill(0, 0, this.width, this.height, 0x88000000);
-              }
+          import re
 
-              @Override
-              protected void renderBlurredBackground(float partialTick) {
-                  // Explicitly disable vanilla's blur pass for this screen.
-              }
+          screen = Path("src/main/java/com/example/taborganizer/client/gui/OrganizerScreen.java")
+          source = screen.read_text()
+          pattern = re.compile(
+              r'    @Override\n'
+              r'    public void render\(GuiGraphics graphics, int mouseX, int mouseY, float partialTick\) \{\n'
+              r'        this\.renderBackground\(graphics, mouseX, mouseY, partialTick\);\n'
+          )
+          replacement = (
+              "    @Override\n"
+              "    public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {\n"
+              "        graphics.fill(0, 0, this.width, this.height, 0x88000000);\n"
+              "    }\n\n"
+              "    @Override\n"
+              "    protected void renderBlurredBackground(float partialTick) {\n"
+              "        // Deliberately disable vanilla's background blur for this editor.\n"
+              "    }\n\n"
+              "    @Override\n"
+              "    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {\n"
+              "        this.renderBackground(graphics, mouseX, mouseY, partialTick);\n"
+          )
+          source, replacements = pattern.subn(replacement, source, count=1)
+          if replacements != 1:
+              raise SystemExit("Could not patch OrganizerScreen render method")
+          screen.write_text(source)
 
-              @Override
-              public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-                  this.renderBackground(graphics, mouseX, mouseY, partialTick);
-          """
-          if anchor not in source:
-              raise SystemExit("Could not locate OrganizerScreen render block")
-          p.write_text(source.replace(anchor, patched, 1))
-          props = Path("gradle.properties")
-          values = props.read_text().replace("mod_version=1.0.0", "mod_version=1.0.2")
-          props.write_text(values)
+          properties = Path("gradle.properties")
+          version_text = properties.read_text()
+          if "mod_version=1.0.0" not in version_text:
+              raise SystemExit("Unexpected source mod_version; refusing an unsafe version edit")
+          properties.write_text(version_text.replace("mod_version=1.0.0", "mod_version=1.0.2", 1))
           PY
           sed -i 's/@Mixin(CreativeModeInventoryScreen.class)/@Mixin(value = CreativeModeInventoryScreen.class, remap = false)/' src/main/java/com/example/taborganizer/mixin/CreativeModeInventoryScreenMixin.java
           sed -i 's/@Mixin(CreativeModeTab.class)/@Mixin(value = CreativeModeTab.class, remap = false)/' src/main/java/com/example/taborganizer/mixin/accessor/CreativeModeTabAccessor.java
