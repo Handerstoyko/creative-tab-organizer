@@ -27,7 +27,36 @@ jobs:
           sed -i "/id 'net.neoforged.gradle.mixin' version/d" build.gradle
           sed -i '/^mixin {$/,/^}$/d' build.gradle
           sed -i '/"refmap":/d' src/main/resources/taborganizer.mixins.json
-          sed -i 's/this.renderBackground(graphics, mouseX, mouseY, partialTick);/graphics.fill(0, 0, this.width, this.height, 0x88000000);/' src/main/java/com/example/taborganizer/client/gui/OrganizerScreen.java
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path("src/main/java/com/example/taborganizer/client/gui/OrganizerScreen.java")
+          source = p.read_text()
+          anchor = """    @Override
+              public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+                  this.renderBackground(graphics, mouseX, mouseY, partialTick);
+          """
+          patched = """    @Override
+              public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+                  // This editor must not use Screen's default blurred-menu background.
+                  graphics.fill(0, 0, this.width, this.height, 0x88000000);
+              }
+
+              @Override
+              protected void renderBlurredBackground(float partialTick) {
+                  // Explicitly disable vanilla's blur pass for this screen.
+              }
+
+              @Override
+              public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+                  this.renderBackground(graphics, mouseX, mouseY, partialTick);
+          """
+          if anchor not in source:
+              raise SystemExit("Could not locate OrganizerScreen render block")
+          p.write_text(source.replace(anchor, patched, 1))
+          props = Path("gradle.properties")
+          values = props.read_text().replace("mod_version=1.0.0", "mod_version=1.0.2")
+          props.write_text(values)
+          PY
           sed -i 's/@Mixin(CreativeModeInventoryScreen.class)/@Mixin(value = CreativeModeInventoryScreen.class, remap = false)/' src/main/java/com/example/taborganizer/mixin/CreativeModeInventoryScreenMixin.java
           sed -i 's/@Mixin(CreativeModeTab.class)/@Mixin(value = CreativeModeTab.class, remap = false)/' src/main/java/com/example/taborganizer/mixin/accessor/CreativeModeTabAccessor.java
           sed -i 's/@Mixin(ClientPacketListener.class)/@Mixin(value = ClientPacketListener.class, remap = false)/' src/main/java/com/example/taborganizer/mixin/accessor/ClientPacketListenerAccessor.java
@@ -55,10 +84,15 @@ jobs:
       - name: Build mod
         run: gradle --no-daemon clean build
 
+      - name: Rename distributable
+        run: |
+          mkdir -p dist
+          cp build/libs/*.jar dist/CreativeTabOrganizer-beta-1.0.2.jar
+
       - name: Upload mod JAR
         uses: actions/upload-artifact@v4
         with:
-          name: CreativeTabOrganizer-1.0.0
-          path: build/libs/*.jar
+          name: CreativeTabOrganizer-beta-1.0.2
+          path: dist/CreativeTabOrganizer-beta-1.0.2.jar
           if-no-files-found: error
           retention-days: 14
