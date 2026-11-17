@@ -22,6 +22,13 @@ jobs:
           cp -a /tmp/creative-tab-organizer/creative-tab-organizer/. .
           rm -f creative-tab-organizer.tar.gz.b64
 
+      - name: Normalize NeoGradle 7 Mixin configuration
+        run: |
+          sed -i "/id 'net.neoforged.gradle.mixin' version/d" build.gradle
+          sed -i '/^mixin {$/,/^}$/d' build.gradle
+          sed -i '/"refmap":/d' src/main/resources/taborganizer.mixins.json
+          sed -i "s/gradle-version: '8.10.2'/gradle-version: '8.13'/g" .github/workflows/build.yml
+
       - name: Set up Java 21
         uses: actions/setup-java@v4
         with:
