@@ -27,6 +27,7 @@ jobs:
           sed -i "/id 'net.neoforged.gradle.mixin' version/d" build.gradle
           sed -i '/^mixin {$/,/^}$/d' build.gradle
           sed -i '/"refmap":/d' src/main/resources/taborganizer.mixins.json
+          sed -i 's/this.renderBackground(graphics, mouseX, mouseY, partialTick);/graphics.fill(0, 0, this.width, this.height, 0x88000000);/' src/main/java/com/example/taborganizer/client/gui/OrganizerScreen.java
           sed -i 's/@Mixin(CreativeModeInventoryScreen.class)/@Mixin(value = CreativeModeInventoryScreen.class, remap = false)/' src/main/java/com/example/taborganizer/mixin/CreativeModeInventoryScreenMixin.java
           sed -i 's/@Mixin(CreativeModeTab.class)/@Mixin(value = CreativeModeTab.class, remap = false)/' src/main/java/com/example/taborganizer/mixin/accessor/CreativeModeTabAccessor.java
           sed -i 's/@Mixin(ClientPacketListener.class)/@Mixin(value = ClientPacketListener.class, remap = false)/' src/main/java/com/example/taborganizer/mixin/accessor/ClientPacketListenerAccessor.java
