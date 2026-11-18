@@ -11,13 +11,19 @@ BASE = ROOT / "src/main/java/com/example/taborganizer"
 settings = BASE / "config/OrganizerSettings.java"
 source = settings.read_text()
 
-needle = '''    /** Move a child up or down without changing the master tab. */
-    public static synchronized boolean shiftMergedTab(CreativeModeTab master, CreativeModeTab child, int direction) {
+needle = '''    /** Restore every original tab that was folded into the selected master. */
+    public static synchronized int unmergeTab(CreativeModeTab master) {
+        if (master == null) return 0;
+        List<String> removed = data().tabMerges.remove(getTabId(master));
+        save();
+        return removed == null ? 0 : removed.size();
+    }
 '''
 if needle not in source:
-    raise SystemExit("Could not locate shiftMergedTab in OrganizerSettings")
+    raise SystemExit("Could not locate unmergeTab in OrganizerSettings")
 
-methods = '''    /** Create an empty group anchored to a visible creative tab. */
+if "createTabGroup(CreativeModeTab master)" not in source:
+    methods = '''    /** Create an empty group anchored to a visible creative tab. */
     public static synchronized boolean createTabGroup(CreativeModeTab master) {
         if (master == null) return false;
         String masterId = getTabId(master);
@@ -93,8 +99,10 @@ methods = '''    /** Create an empty group anchored to a visible creative tab. *
         return true;
     }
 
-''' + needle
-source = source.replace(needle, methods, 1)
+'''
+    source = source.replace(needle, methods + needle, 1)
+settings.write_text(source)
+
 settings.write_text(source)
 
 # ---------------------------------------------------------------------------
