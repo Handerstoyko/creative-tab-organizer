@@ -138,7 +138,7 @@ jobs:
           sed -i 's/ClientHooks.getPageButtonComponent(false)/Component.literal(">")/' src/main/java/com/example/taborganizer/mixin/CreativeModeInventoryScreenMixin.java
           sed -i '/import net.neoforged.neoforge.client.ClientHooks;/d' src/main/java/com/example/taborganizer/mixin/CreativeModeInventoryScreenMixin.java
 
-      - name: Apply beta 1.0.4 features
+      - name: Apply beta 1.0.5 responsive layout
         run: python3 scripts/patch_beta_1_0_4.py
 
       - name: Set up Java 21
@@ -158,12 +158,12 @@ jobs:
       - name: Prepare distributable
         run: |
           mkdir -p dist
-          cp build/libs/*.jar dist/CreativeTabOrganizer-beta-1.0.4.jar
+          cp build/libs/*.jar dist/CreativeTabOrganizer-beta-1.0.5.jar
 
       - name: Upload mod JAR
         uses: actions/upload-artifact@v4
         with:
-          name: CreativeTabOrganizer-beta-1.0.4
-          path: dist/CreativeTabOrganizer-beta-1.0.4.jar
+          name: CreativeTabOrganizer-beta-1.0.5
+          path: dist/CreativeTabOrganizer-beta-1.0.5.jar
           if-no-files-found: error
           retention-days: 14
