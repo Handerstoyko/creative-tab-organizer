@@ -22,6 +22,20 @@ jobs:
           cp -a /tmp/creative-tab-organizer/creative-tab-organizer/. .
           rm -f creative-tab-organizer.tar.gz.b64
 
+      - name: Upload source snapshot for beta 1.0.8
+        uses: actions/upload-artifact@v4
+        with:
+          name: CTA-source-beta108-inspection
+          path: |
+            src/main/java/com/example/taborganizer/config/OrganizerSettings.java
+            src/main/java/com/example/taborganizer/mixin/CreativeModeInventoryScreenMixin.java
+            src/main/java/com/example/taborganizer/mixin/CreativeModeTabRegistryMixin.java
+            src/main/java/com/example/taborganizer/client/ClientGameEvents.java
+            src/main/java/com/example/taborganizer/client/gui/OrganizerScreen.java
+            src/main/resources/taborganizer.mixins.json
+          if-no-files-found: error
+          retention-days: 1
+
       - name: Normalize NeoGradle Mixin setup
         run: |
           sed -i "/id 'net.neoforged.gradle.mixin' version/d" build.gradle
