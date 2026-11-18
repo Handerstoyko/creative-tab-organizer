@@ -256,7 +256,7 @@ public final class OrganizerScreen extends Screen {
             int rowY = listY + visible * ROW_HEIGHT;
 
             if (entry.header) {
-                boolean targeted = isDragging() && !dropToHeap && dropEntryIndex == entryIndex;
+                boolean targeted = taborganizer$isDragging() && !dropToHeap && dropEntryIndex == entryIndex;
                 int bg = targeted ? 0xFF5D5838 : 0xFF344252;
                 graphics.fill(listX + 1, rowY + 1, listX + LIST_WIDTH - 1, rowY + ROW_HEIGHT - 1, bg);
                 int count = pageSizes.get(entry.pageIndex);
@@ -272,7 +272,7 @@ public final class OrganizerScreen extends Screen {
                 int background = dragging ? 0xFF6A5135 : (selected ? 0xFF465A73 : 0xFF252B33);
                 graphics.fill(listX + 1, rowY + 1, listX + LIST_WIDTH - 1, rowY + ROW_HEIGHT - 1, background);
 
-                if (isDragging() && !dropToHeap && dropEntryIndex == entryIndex) {
+                if (taborganizer$isDragging() && !dropToHeap && dropEntryIndex == entryIndex) {
                     int lineY = dropAfter ? rowY + ROW_HEIGHT - 2 : rowY + 1;
                     graphics.fill(listX + 2, lineY, listX + LIST_WIDTH - 2, lineY + 2, 0xFFFFD477);
                 }
@@ -328,7 +328,7 @@ public final class OrganizerScreen extends Screen {
         graphics.fill(listX + LIST_WIDTH - 5, thumbY, listX + LIST_WIDTH - 1, thumbY + thumbHeight, 0xFFB5BBC4);
     }
 
-    private boolean isDragging() {
+    private boolean taborganizer$isDragging() {
         return dragIndex >= 0 || draggingHeap;
     }
 
@@ -391,7 +391,7 @@ public final class OrganizerScreen extends Screen {
             dropTabIndex = -1;
             return true;
         }
-        if (button == 0 && isDragging() && isInsideTabList(mouseX, mouseY)) {
+        if (button == 0 && taborganizer$isDragging() && isInsideTabList(mouseX, mouseY)) {
             dropToHeap = false;
             int entryIndex = rowIndexAt(mouseY);
             List<ListEntry> entries = buildListEntries();
@@ -404,7 +404,7 @@ public final class OrganizerScreen extends Screen {
             }
             return true;
         }
-        if (button == 0 && isDragging()) {
+        if (button == 0 && taborganizer$isDragging()) {
             dropToHeap = false;
             dropEntryIndex = -1;
             dropPageIndex = -1;
@@ -416,7 +416,7 @@ public final class OrganizerScreen extends Screen {
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        if (button == 0 && isDragging()) {
+        if (button == 0 && taborganizer$isDragging()) {
             finishDrag();
             return true;
         }
