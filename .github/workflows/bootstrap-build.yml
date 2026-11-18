@@ -9,7 +9,7 @@ permissions:
   contents: read
 
 jobs:
-  build:
+  bootstrap:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -21,6 +21,22 @@ jobs:
           base64 --decode creative-tab-organizer.tar.gz.b64 | tar -xz -C /tmp/creative-tab-organizer
           cp -a /tmp/creative-tab-organizer/creative-tab-organizer/. .
           rm -f creative-tab-organizer.tar.gz.b64
+
+      - name: Normalize NeoGradle Mixin setup
+        run: |
+          sed -i "/id 'net.neoforged.gradle.mixin' version/d" build.gradle
+          sed -i '/^mixin {$/,/^}$/d' build.gradle
+          sed -i '/"refmap":/d' src/main/resources/taborganizer.mixins.json
+          sed -i 's/@Mixin(CreativeModeInventoryScreen.class)/@Mixin(value = CreativeModeInventoryScreen.class, remap = false)/' src/main/java/com/example/taborganizer/mixin/CreativeModeInventoryScreenMixin.java
+          sed -i 's/@Mixin(CreativeModeTabRegistry.class)/@Mixin(value = CreativeModeTabRegistry.class, remap = false)/' src/main/java/com/example/taborganizer/mixin/CreativeModeTabRegistryMixin.java
+          sed -i 's/@Mixin(CreativeModeInventoryScreen.class)/@Mixin(value = CreativeModeInventoryScreen.class, remap = false)/' src/main/java/com/example/taborganizer/mixin/accessor/CreativeModeInventoryScreenAccessor.java
+          sed -i 's/@Mixin(CreativeModeTab.class)/@Mixin(value = CreativeModeTab.class, remap = false)/' src/main/java/com/example/taborganizer/mixin/accessor/CreativeModeTabAccessor.java
+          sed -i 's/@Mixin(ClientPacketListener.class)/@Mixin(value = ClientPacketListener.class, remap = false)/' src/main/java/com/example/taborganizer/mixin/accessor/ClientPacketListenerAccessor.java
+          sed -i 's/@Accessor("row")/@Accessor(value = "row", remap = false)/' src/main/java/com/example/taborganizer/mixin/accessor/CreativeModeTabAccessor.java
+          sed -i 's/@Accessor("column")/@Accessor(value = "column", remap = false)/' src/main/java/com/example/taborganizer/mixin/accessor/CreativeModeTabAccessor.java
+          sed -i 's/@Accessor("selectedTab")/@Accessor(value = "selectedTab", remap = false)/' src/main/java/com/example/taborganizer/mixin/accessor/CreativeModeInventoryScreenAccessor.java
+          sed -i 's/@Accessor("displayOperatorCreativeTab")/@Accessor(value = "displayOperatorCreativeTab", remap = false)/' src/main/java/com/example/taborganizer/mixin/accessor/CreativeModeInventoryScreenAccessor.java
+          sed -i 's/@Accessor("enabledFeatures")/@Accessor(value = "enabledFeatures", remap = false)/' src/main/java/com/example/taborganizer/mixin/accessor/ClientPacketListenerAccessor.java
 
       - name: Set up Java 21
         uses: actions/setup-java@v4
