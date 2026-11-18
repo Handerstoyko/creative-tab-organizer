@@ -221,7 +221,18 @@ source = source.replace(
     1
 )
 
-# Place merge controls above reset/save/close.
+# Move each existing action by locating its own button block, so new buttons
+# cannot accidentally be shifted by a later replacement.
+for marker, new_y in (
+    ('Button.builder(Component.translatable("screen.taborganizer.reset")', 264),
+    ('Button.builder(Component.translatable("screen.taborganizer.save")', 290),
+    ('Button.builder(Component.translatable("gui.done")', 316),
+):
+    start_index = source.index(marker)
+    bounds_index = source.index('.bounds(rightX, panelY + ', start_index)
+    end_index = source.index(', rightWidth, 20).build());', bounds_index)
+    source = source[:bounds_index] + f'.bounds(rightX, panelY + {new_y}' + source[end_index:]
+
 needle = '''        this.addRenderableWidget(Button.builder(Component.translatable("screen.taborganizer.reset"), button -> {
 '''
 buttons = '''        this.addRenderableWidget(Button.builder(Component.literal("Об'єднати вибрані"), button -> mergeSelectedTabs())
@@ -234,22 +245,6 @@ buttons = '''        this.addRenderableWidget(Button.builder(Component.literal("
 if needle not in source:
     raise SystemExit("Could not locate reset button")
 source = source.replace(needle, buttons, 1)
-
-source = source.replace(
-    '.bounds(rightX, panelY + 212, rightWidth, 20).build());',
-    '.bounds(rightX, panelY + 264, rightWidth, 20).build());',
-    1
-)
-source = source.replace(
-    '.bounds(rightX, panelY + 238, rightWidth, 20).build());',
-    '.bounds(rightX, panelY + 290, rightWidth, 20).build());',
-    1
-)
-source = source.replace(
-    '.bounds(rightX, panelY + 264, rightWidth, 20).build());',
-    '.bounds(rightX, panelY + 316, rightWidth, 20).build());',
-    1
-)
 
 # Make sure reset also clears transient multi-selection.
 source = source.replace(
