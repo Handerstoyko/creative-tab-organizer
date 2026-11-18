@@ -22,6 +22,18 @@ jobs:
           cp -a /tmp/creative-tab-organizer/creative-tab-organizer/. .
           rm -f creative-tab-organizer.tar.gz.b64
 
+      - name: Upload restored source for merge feature inspection
+        uses: actions/upload-artifact@v4
+        with:
+          name: CTA-source-inspection
+          path: |
+            src/main/java/com/example/taborganizer/config/OrganizerSettings.java
+            src/main/java/com/example/taborganizer/mixin/CreativeModeTabRegistryMixin.java
+            src/main/java/com/example/taborganizer/mixin/CreativeModeInventoryScreenMixin.java
+            src/main/resources/taborganizer.mixins.json
+          if-no-files-found: error
+          retention-days: 1
+
       - name: Normalize NeoGradle Mixin setup
         run: |
           sed -i "/id 'net.neoforged.gradle.mixin' version/d" build.gradle
