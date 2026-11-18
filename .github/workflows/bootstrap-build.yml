@@ -150,6 +150,21 @@ jobs:
       - name: Apply beta 1.0.8 nested groups and page heading
         run: python3 scripts/patch_beta_1_0_8.py
 
+      - name: Upload transformed beta 1.0.8 sources for follow-up
+        uses: actions/upload-artifact@v4
+        with:
+          name: CTA-transformed-beta108-final
+          path: |
+            src/main/java/com/example/taborganizer/config/OrganizerSettings.java
+            src/main/java/com/example/taborganizer/mixin/CreativeModeInventoryScreenMixin.java
+            src/main/java/com/example/taborganizer/mixin/CreativeModeTabRegistryMixin.java
+            src/main/java/com/example/taborganizer/mixin/CreativeModeTabMixin.java
+            src/main/java/com/example/taborganizer/mixin/accessor/AbstractContainerScreenAccessor.java
+            src/main/java/com/example/taborganizer/client/gui/OrganizerScreen.java
+            src/main/resources/taborganizer.mixins.json
+          if-no-files-found: error
+          retention-days: 1
+
       - name: Set up Java 21
         uses: actions/setup-java@v4
         with:
