@@ -57,6 +57,7 @@ public final class OrganizerScreen extends Screen {
 
     private int panelX;
     private int panelY;
+    private float uiScale = 1.0F;
     private EditBox pageNameField;
     private EditBox pageSizeField;
 
@@ -69,8 +70,13 @@ public final class OrganizerScreen extends Screen {
 
     @Override
     protected void init() {
-        panelX = (this.width - PANEL_WIDTH) / 2;
-        panelY = (this.height - PANEL_HEIGHT) / 2;
+        float scaleX = (this.width - 12.0F) / PANEL_WIDTH;
+        float scaleY = (this.height - 12.0F) / PANEL_HEIGHT;
+        uiScale = Math.max(0.10F, Math.min(1.0F, Math.min(scaleX, scaleY)));
+        int designWidth = (int) (this.width / uiScale);
+        int designHeight = (int) (this.height / uiScale);
+        panelX = (designWidth - PANEL_WIDTH) / 2;
+        panelY = (designHeight - PANEL_HEIGHT) / 2;
 
         int rightX = panelX + RIGHT_X_OFFSET;
         int rightWidth = RIGHT_WIDTH;
@@ -205,6 +211,10 @@ public final class OrganizerScreen extends Screen {
 
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        graphics.pose().pushPose();
+        graphics.pose().scale(uiScale, uiScale, 1.0F);
+        int scaledMouseX = (int) (mouseX / uiScale);
+        int scaledMouseY = (int) (mouseY / uiScale);
         int x = panelX;
         int y = panelY;
         graphics.fill(x, y, x + PANEL_WIDTH, y + PANEL_HEIGHT, 0xF0202329);
@@ -307,7 +317,8 @@ public final class OrganizerScreen extends Screen {
                     statusIsError ? 0xFFFF7777 : 0xFF9FE3A7, false);
         }
 
-        super.render(graphics, mouseX, mouseY, partialTick);
+        super.render(graphics, scaledMouseX, scaledMouseY, partialTick);
+        graphics.pose().popPose();
     }
 
     private void renderHeapScrollbar(GuiGraphics graphics, int heapX, int listY, int listHeight) {
@@ -342,6 +353,8 @@ public final class OrganizerScreen extends Screen {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        mouseX /= uiScale;
+        mouseY /= uiScale;
         if (button == 0 && isInsideHeap(mouseX, mouseY)) {
             int index = heapRowIndexAt(mouseY);
             if (index >= 0 && index < heapTabs.size()) {
@@ -384,6 +397,10 @@ public final class OrganizerScreen extends Screen {
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        mouseX /= uiScale;
+        mouseY /= uiScale;
+        dragX /= uiScale;
+        dragY /= uiScale;
         if (button == 0 && dragIndex >= 0 && isInsideHeap(mouseX, mouseY)) {
             dropToHeap = true;
             dropEntryIndex = -1;
@@ -574,6 +591,8 @@ public final class OrganizerScreen extends Screen {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        mouseX /= uiScale;
+        mouseY /= uiScale;
         int delta = (int) Math.signum(scrollY) * 2;
         if (isInsideHeap(mouseX, mouseY)) {
             int maxOffset = Math.max(0, heapTabs.size() - VISIBLE_ROWS);
