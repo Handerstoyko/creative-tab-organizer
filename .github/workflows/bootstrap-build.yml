@@ -22,6 +22,14 @@ jobs:
           cp -a /tmp/creative-tab-organizer/creative-tab-organizer/. .
           rm -f creative-tab-organizer.tar.gz.b64
 
+      - name: Inspect current Java sources
+        run: |
+          find src/main/java/com/example/taborganizer -type f -name '*.java' -print
+          for f in $(find src/main/java/com/example/taborganizer -type f -name '*.java' | sort); do
+            echo "===== SOURCE: $f ====="
+            cat "$f"
+          done
+
       - name: Normalize NeoGradle Mixin setup
         run: |
           sed -i "/id 'net.neoforged.gradle.mixin' version/d" build.gradle
