@@ -522,13 +522,11 @@ mixin = BASE / "mixin/CreativeModeInventoryScreenMixin.java"
 source = mixin.read_text()
 
 # Remove the previous render-tail label injector and replace it with a reusable draw method.
-render_pattern = re.compile(
-    r'    @Inject\\(method = "render".*?private void taborganizer\\$renderPageHeading\\(.*?\\n    }\\n',
-    re.S
-)
-source, render_count = render_pattern.subn("", source, count=1)
-if render_count != 1:
-    raise SystemExit("Could not remove existing page-title render injector")
+render_start = source.find('    @Inject(method = "render",')
+click_start = source.find('    @Inject(method = "mouseClicked"', render_start)
+if render_start < 0 or click_start < 0:
+    raise SystemExit("Could not locate old page-title renderer and click handler")
+source = source[:render_start] + source[click_start:]
 
 # Add an init-tail renderable. Since it is appended after the vanilla controls,
 # it paints the plaque above (and fully covers) the vanilla page counter.
