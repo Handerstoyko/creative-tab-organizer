@@ -134,6 +134,9 @@ jobs:
               text = text.replace(needle, replacement, 1)
           config.write_text(text)
           PY
+          sed -i 's/ClientHooks.getPageButtonComponent(true)/Component.literal("<")/' src/main/java/com/example/taborganizer/mixin/CreativeModeInventoryScreenMixin.java
+          sed -i 's/ClientHooks.getPageButtonComponent(false)/Component.literal(">")/' src/main/java/com/example/taborganizer/mixin/CreativeModeInventoryScreenMixin.java
+          sed -i '/import net.neoforged.neoforge.client.ClientHooks;/d' src/main/java/com/example/taborganizer/mixin/CreativeModeInventoryScreenMixin.java
 
       - name: Set up Java 21
         uses: actions/setup-java@v4
