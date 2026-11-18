@@ -42,18 +42,32 @@ if done_start >= 0:
     done_end = source.find('\n', done_end)
     source = source[:done_start] + source[done_end + 1:]
 
-# Add a short footer hint underneath the remaining controls.
-footer_anchor = '''        graphics.drawString(this.font, Component.literal(statusMessage),
-                rightX, y + 290, statusIsError ? 0xFFFF7777 : 0xFFB8C0CC, false);
+# Remove the redundant Done button; Escape and Save & Close already close the editor.
+done_marker = '        this.addRenderableWidget(Button.builder(Component.translatable("gui.done"), button -> onClose())'
+done_start = source.find(done_marker)
+if done_start >= 0:
+    done_end = source.find('.build());', done_start)
+    if done_end < 0:
+        raise SystemExit("Could not locate end of duplicate Done button")
+    done_end = source.find('\n', done_end)
+    source = source[:done_start] + source[done_end + 1:]
+
+# Put the current status and the ungrouping hint in a compact footer.
+status_old = '''        if (!statusMessage.isBlank()) {
+            graphics.drawString(this.font, trimToWidth(statusMessage, RIGHT_WIDTH), rightX, y + 290,
+                    statusIsError ? 0xFFFF7777 : 0xFF9FE3A7, false);
+        }
 '''
-footer_replacement = '''        graphics.drawString(this.font, Component.literal(statusMessage),
-                rightX, y + 278, statusIsError ? 0xFFFF7777 : 0xFFB8C0CC, false);
+status_new = '''        if (!statusMessage.isBlank()) {
+            graphics.drawString(this.font, trimToWidth(statusMessage, RIGHT_WIDTH), rightX, y + 268,
+                    statusIsError ? 0xFFFF7777 : 0xFF9FE3A7, false);
+        }
         graphics.drawString(this.font,
-                Component.literal("Щоб розформувати групу, перетягни її вкладку на сторінку."),
-                rightX, y + 292, 0xFF9BA8B6, false);
+                trimToWidth("Перетягни вкладку з групи на рядок або заголовок сторінки, щоб повернути її.", RIGHT_WIDTH),
+                rightX, y + 284, 0xFF9BA8B6, false);
 '''
-if footer_anchor in source:
-    source = source.replace(footer_anchor, footer_replacement, 1)
+if status_old in source:
+    source = source.replace(status_old, status_new, 1)
 
 # Selecting a child starts a drag. Clear every previous drop destination at the start.
 source = source.replace(
@@ -148,7 +162,7 @@ source = source.replace(old_drag, new_drag, 1)
 # Highlight page headers and ordinary rows as valid ungrouping drop zones.
 source = source.replace(
     'boolean targeted = taborganizer$isDragging() && !dropToHeap && dropEntryIndex == entryIndex;',
-    'boolean targeted = (taborganizer$isDragging() && !dropToHeap && dropEntryIndex == entryIndex)\\n'
+    'boolean targeted = (taborganizer$isDragging() && !dropToHeap && dropEntryIndex == entryIndex)\n'
     '                        || (draggingGroupChild && groupDropPageIndex == entry.pageIndex);',
     1
 )
