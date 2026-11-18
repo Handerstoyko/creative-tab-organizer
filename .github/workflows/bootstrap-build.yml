@@ -37,6 +37,103 @@ jobs:
           sed -i 's/@Accessor("selectedTab")/@Accessor(value = "selectedTab", remap = false)/' src/main/java/com/example/taborganizer/mixin/accessor/CreativeModeInventoryScreenAccessor.java
           sed -i 's/@Accessor("displayOperatorCreativeTab")/@Accessor(value = "displayOperatorCreativeTab", remap = false)/' src/main/java/com/example/taborganizer/mixin/accessor/CreativeModeInventoryScreenAccessor.java
           sed -i 's/@Accessor("enabledFeatures")/@Accessor(value = "enabledFeatures", remap = false)/' src/main/java/com/example/taborganizer/mixin/accessor/ClientPacketListenerAccessor.java
+          python3 - <<'PY'
+          from pathlib import Path
+
+          base = Path("src/main/java/com/example/taborganizer")
+          accessors = base / "mixin/accessor"
+
+          (accessors / "CreativeModeInventoryScreenAccessor.java").write_text("""package com.example.taborganizer.mixin.accessor;
+
+          import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
+          import net.minecraft.world.item.CreativeModeTab;
+          import net.neoforged.neoforge.client.gui.CreativeTabsScreenPage;
+          import org.spongepowered.asm.mixin.Mixin;
+          import org.spongepowered.asm.mixin.gen.Accessor;
+          import java.util.List;
+
+          @Mixin(value = CreativeModeInventoryScreen.class, remap = false)
+          public interface CreativeModeInventoryScreenAccessor {
+              @Accessor(value = "selectedTab", remap = false)
+              static CreativeModeTab taborganizer$getSelectedTab() {
+                  throw new AssertionError("Mixin accessor");
+              }
+
+              @Accessor(value = "displayOperatorCreativeTab", remap = false)
+              boolean taborganizer$getDisplayOperatorCreativeTab();
+
+              @Accessor(value = "pages", remap = false)
+              List<CreativeTabsScreenPage> taborganizer$getPages();
+          }
+          """)
+
+          (accessors / "AbstractContainerScreenAccessor.java").write_text("""package com.example.taborganizer.mixin.accessor;
+
+          import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+          import org.spongepowered.asm.mixin.Mixin;
+          import org.spongepowered.asm.mixin.gen.Accessor;
+
+          @Mixin(value = AbstractContainerScreen.class, remap = false)
+          public interface AbstractContainerScreenAccessor {
+              @Accessor(value = "leftPos", remap = false)
+              int taborganizer$getLeftPos();
+
+              @Accessor(value = "topPos", remap = false)
+              int taborganizer$getTopPos();
+
+              @Accessor(value = "imageWidth", remap = false)
+              int taborganizer$getImageWidth();
+          }
+          """)
+
+          (accessors / "ScreenAccessor.java").write_text("""package com.example.taborganizer.mixin.accessor;
+
+          import net.minecraft.client.gui.components.Renderable;
+          import net.minecraft.client.gui.components.events.GuiEventListener;
+          import net.minecraft.client.gui.narration.NarratableEntry;
+          import net.minecraft.client.gui.screens.Screen;
+          import org.spongepowered.asm.mixin.Mixin;
+          import org.spongepowered.asm.mixin.gen.Invoker;
+
+          @Mixin(value = Screen.class, remap = false)
+          public interface ScreenAccessor {
+              @Invoker(value = "addRenderableWidget", remap = false)
+              <T extends GuiEventListener & Renderable & NarratableEntry> T taborganizer$addRenderableWidget(T widget);
+          }
+          """)
+
+          mixin = base / "mixin/CreativeModeInventoryScreenMixin.java"
+          source = mixin.read_text()
+          source = source.replace(
+              "import com.example.taborganizer.mixin.accessor.CreativeModeInventoryScreenAccessor;",
+              "import com.example.taborganizer.mixin.accessor.CreativeModeInventoryScreenAccessor;\\n"
+              "import com.example.taborganizer.mixin.accessor.AbstractContainerScreenAccessor;\\n"
+              "import com.example.taborganizer.mixin.accessor.ScreenAccessor;"
+          )
+          source = source.replace(
+              "        CreativeModeInventoryScreenAccessor accessor = (CreativeModeInventoryScreenAccessor) (Object) this;\\n"
+              "        List<CreativeTabsScreenPage> pages = accessor.taborganizer$getPages();",
+              "        CreativeModeInventoryScreenAccessor accessor = (CreativeModeInventoryScreenAccessor) (Object) this;\\n"
+              "        AbstractContainerScreenAccessor containerAccessor = (AbstractContainerScreenAccessor) (Object) this;\\n"
+              "        ScreenAccessor screenAccessor = (ScreenAccessor) (Object) this;\\n"
+              "        List<CreativeTabsScreenPage> pages = accessor.taborganizer$getPages();"
+          )
+          source = source.replace("accessor.taborganizer$addRenderableWidget(", "screenAccessor.taborganizer$addRenderableWidget(")
+          source = source.replace("accessor.taborganizer$getLeftPos()", "containerAccessor.taborganizer$getLeftPos()")
+          source = source.replace("accessor.taborganizer$getTopPos()", "containerAccessor.taborganizer$getTopPos()")
+          source = source.replace("accessor.taborganizer$getImageWidth()", "containerAccessor.taborganizer$getImageWidth()")
+          mixin.write_text(source)
+
+          config = Path("src/main/resources/taborganizer.mixins.json")
+          text = config.read_text()
+          needle = '    "accessor.CreativeModeInventoryScreenAccessor",'
+          replacement = needle + '\\n    "accessor.AbstractContainerScreenAccessor",\\n    "accessor.ScreenAccessor",'
+          if "accessor.AbstractContainerScreenAccessor" not in text:
+              if needle not in text:
+                  raise SystemExit("Could not find mixin config insertion point")
+              text = text.replace(needle, replacement, 1)
+          config.write_text(text)
+          PY
 
       - name: Set up Java 21
         uses: actions/setup-java@v4
