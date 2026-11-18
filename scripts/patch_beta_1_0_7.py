@@ -217,7 +217,7 @@ source = source.replace(
 
 source = source.replace(
     '        graphics.drawString(this.font, Component.translatable("screen.taborganizer.hint"),\n                x + 12, y + 25, 0xB8C0CC, false);',
-    '        graphics.drawString(this.font, Component.literal("Ctrl+клік: вибрати кілька вкладок для об\\'єднання"),\n                x + 12, y + 25, 0xB8C0CC, false);',
+    '        graphics.drawString(this.font, Component.literal("Ctrl+клік: вибери кілька вкладок для злиття"),\n                x + 12, y + 25, 0xB8C0CC, false);',
     1
 )
 
