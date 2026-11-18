@@ -22,18 +22,6 @@ jobs:
           cp -a /tmp/creative-tab-organizer/creative-tab-organizer/. .
           rm -f creative-tab-organizer.tar.gz.b64
 
-      - name: Upload restored source for merge feature inspection
-        uses: actions/upload-artifact@v4
-        with:
-          name: CTA-source-inspection
-          path: |
-            src/main/java/com/example/taborganizer/config/OrganizerSettings.java
-            src/main/java/com/example/taborganizer/mixin/CreativeModeTabRegistryMixin.java
-            src/main/java/com/example/taborganizer/mixin/CreativeModeInventoryScreenMixin.java
-            src/main/resources/taborganizer.mixins.json
-          if-no-files-found: error
-          retention-days: 1
-
       - name: Normalize NeoGradle Mixin setup
         run: |
           sed -i "/id 'net.neoforged.gradle.mixin' version/d" build.gradle
@@ -156,6 +144,9 @@ jobs:
       - name: Apply beta 1.0.6 page and tab labels
         run: python3 scripts/patch_beta_1_0_6.py
 
+      - name: Apply beta 1.0.7 tab merging
+        run: python3 scripts/patch_beta_1_0_7.py
+
       - name: Set up Java 21
         uses: actions/setup-java@v4
         with:
@@ -173,12 +164,12 @@ jobs:
       - name: Prepare distributable
         run: |
           mkdir -p dist
-          cp build/libs/*.jar dist/CreativeTabOrganizer-beta-1.0.6.jar
+          cp build/libs/*.jar dist/CreativeTabOrganizer-beta-1.0.7.jar
 
       - name: Upload mod JAR
         uses: actions/upload-artifact@v4
         with:
-          name: CreativeTabOrganizer-beta-1.0.6
-          path: dist/CreativeTabOrganizer-beta-1.0.6.jar
+          name: CreativeTabOrganizer-beta-1.0.7
+          path: dist/CreativeTabOrganizer-beta-1.0.7.jar
           if-no-files-found: error
           retention-days: 14
