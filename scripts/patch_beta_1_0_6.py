@@ -215,6 +215,12 @@ source = source.replace(
     'rightX, y + 290,',
     1
 )
+# Preserve the currently edited tab label when the selected tab is dragged.
+source = source.replace(
+    '        saveCurrentPageTitle();\\n        tabs.remove(sourceIndex);',
+    '        saveCurrentPageTitle();\\n        saveCurrentTabName();\\n        tabs.remove(sourceIndex);',
+    1
+)
 screen.write_text(source)
 
 # Add a client-side alias hook so the name appears on the actual creative tab as well.
