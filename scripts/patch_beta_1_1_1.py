@@ -384,17 +384,40 @@ render_labels = r'''    @Inject(method = "renderLabels", at = @At("TAIL"), remap
 source = source[:init_start] + render_labels + source[class_end:]
 mixin.write_text(source)
 
-# Update the click target to the same screen-space position as the renderLabels plaque.
-click_start = source.find('    @Inject(method = "mouseClicked"')
-click_end = source.find('\n    }\n', click_start)
-if click_start < 0 or click_end < 0:
-    raise SystemExit("Could not find the existing page-heading click handler")
-click_block = source[click_start:click_end + 7]
-click_block = click_block.replace(
-    'int boxY = dimensions.taborganizer$getTopPos() - 50;',
-    'int boxY = dimensions.taborganizer$getTopPos() - 70;'
-)
-source = source[:click_start] + click_block + source[click_end + 7:]
+# Restore the click handler for the same screen-space rectangle as the renderLabels plaque.
+click_handler = r'''    @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true, remap = false)
+    private void taborganizer$openEditorFromPageHeading(double mouseX, double mouseY, int button,
+            CallbackInfoReturnable<Boolean> cir) {
+        if (button != 0) return;
+
+        CreativeModeInventoryScreen screen = (CreativeModeInventoryScreen) (Object) this;
+        CreativeModeInventoryScreenAccessor accessor = (CreativeModeInventoryScreenAccessor) (Object) this;
+        List<CreativeTabsScreenPage> pages = accessor.taborganizer$getPages();
+        int pageIndex = pages.indexOf(screen.getCurrentPage());
+        if (pageIndex < 0) return;
+
+        AbstractContainerScreenAccessor dimensions = (AbstractContainerScreenAccessor) (Object) this;
+        int boxX = dimensions.taborganizer$getLeftPos() + 24;
+        int boxY = dimensions.taborganizer$getTopPos() - 70;
+        int boxWidth = Math.max(40, dimensions.taborganizer$getImageWidth() - 48);
+
+        if (mouseX >= boxX && mouseX <= boxX + boxWidth
+                && mouseY >= boxY && mouseY <= boxY + 20) {
+            Minecraft.getInstance().setScreen(new OrganizerScreen(screen));
+            cir.setReturnValue(true);
+        }
+    }
+'''
+if "taborganizer$openEditorFromPageHeading" in source:
+    click_start = source.find('    @Inject(method = "mouseClicked"')
+    click_end = source.find('\n    }\n', click_start)
+    if click_start >= 0 and click_end >= 0:
+        source = source[:click_start] + click_handler + source[click_end + 7:]
+else:
+    pos = source.rfind("\n}")
+    if pos < 0:
+        raise SystemExit("Could not locate closing brace for page-heading click handler")
+    source = source[:pos] + "\n\n" + click_handler + source[pos:]
 mixin.write_text(source)
 
 # ---------------------------------------------------------------------------
