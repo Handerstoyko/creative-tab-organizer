@@ -408,7 +408,7 @@ props.write_text(text)
 toml = ROOT / "src/main/resources/META-INF/neoforge.mods.toml"
 if toml.exists():
     text = toml.read_text()
-    text = re.sub(r'(?m)^(version\\s*=\\s*")[^"]+(".*)$', r'\\g<1>1.0.7\\2', text)
+    text = re.sub(r'(?m)^(version\s*=\s*")[^"]+(".*)$', r'\g<1>1.0.7\2', text)
     toml.write_text(text)
 
 print("Applied beta 1.0.7: merge multiple creative tabs into one, keep source tabs hidden, and allow unmerging.")
