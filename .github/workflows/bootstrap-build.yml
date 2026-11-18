@@ -159,6 +159,21 @@ jobs:
       - name: Apply beta 1.1.1 ungroup drag and topmost page overlay
         run: python3 scripts/patch_beta_1_1_1.py
 
+      - name: Inspect page sizing and final inventory mixins
+        uses: actions/upload-artifact@v4
+        with:
+          name: CTA-page-size-inspection
+          path: |
+            src/main/java/com/example/taborganizer/config/OrganizerSettings.java
+            src/main/java/com/example/taborganizer/mixin/CreativeModeTabRegistryMixin.java
+            src/main/java/com/example/taborganizer/mixin/CreativeModeInventoryScreenMixin.java
+            src/main/java/com/example/taborganizer/mixin/accessor/CreativeModeInventoryScreenAccessor.java
+            src/main/java/com/example/taborganizer/mixin/accessor/AbstractContainerScreenAccessor.java
+            src/main/java/com/example/taborganizer/mixin/accessor/CreativeModeTabAccessor.java
+            src/main/java/com/example/taborganizer/client/gui/OrganizerScreen.java
+          if-no-files-found: error
+          retention-days: 1
+
       - name: Set up Java 21
         uses: actions/setup-java@v4
         with:
