@@ -404,6 +404,13 @@ public final class OrganizerScreen extends Screen {
             }
             return true;
         }
+        if (button == 0 && isDragging()) {
+            dropToHeap = false;
+            dropEntryIndex = -1;
+            dropPageIndex = -1;
+            dropTabIndex = -1;
+            return true;
+        }
         return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
     }
 
