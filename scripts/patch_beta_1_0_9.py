@@ -362,6 +362,12 @@ source = source.replace(
     '                    mergeSelection.clear();\n                    groupSelection.clear();\n                    selectedGroupMaster = null;\n                    selectedGroupChild = null;\n                    draggingGroupChild = false;\n                    saveCurrentPageTitle();',
     1
 )
+# Save a selected child's custom label before clearing the child selection on a page header click.
+source = source.replace(
+    '                    mergeSelection.clear();\n                    groupSelection.clear();\n                    selectedGroupMaster = null;\n                    selectedGroupChild = null;\n                    draggingGroupChild = false;\n                    saveCurrentPageTitle();\n                    saveCurrentTabName();',
+    '                    saveCurrentTabName();\n                    saveCurrentPageTitle();\n                    mergeSelection.clear();\n                    groupSelection.clear();\n                    selectedGroupMaster = null;\n                    selectedGroupChild = null;\n                    draggingGroupChild = false;',
+    1
+)
 
 # Include group dragging in the shared drag indicator.
 source = source.replace(
