@@ -67,9 +67,7 @@ methods = '''    /** Create an empty group anchored to a visible creative tab. *
             }
         }
 
-        // Drop empty stale groups, but keep the destination even when it has no children yet.
-        current.tabMerges.entrySet().removeIf(entry ->
-                !entry.getKey().equals(masterId) && (entry.getValue() == null || entry.getValue().isEmpty()));
+        // Keep empty groups available as future drag-and-drop targets.
         save();
         return true;
     }
