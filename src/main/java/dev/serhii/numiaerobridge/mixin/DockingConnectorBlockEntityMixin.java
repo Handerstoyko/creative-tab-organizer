@@ -174,24 +174,28 @@ public abstract class DockingConnectorBlockEntityMixin {
                     }
 
                     if (!remainder.isEmpty()) {
-                        try {
-                            Level level = (Level) connectorBlockEntity.getClass()
-                                .getMethod("getLevel")
-                                .invoke(connectorBlockEntity);
-                            net.minecraft.core.BlockPos position = (net.minecraft.core.BlockPos) connectorBlockEntity.getClass()
-                                .getMethod("getBlockPos")
-                                .invoke(connectorBlockEntity);
-                            dropAtConnector(level, position.getCenter(), remainder);
-                        } catch (ReflectiveOperationException | LinkageError exception) {
-                            NumismaticsAeronauticsBridge.LOGGER.error(
-                                "Could not return leftover items to the Docking Connector.",
-                                exception
-                            );
-                        }
+                        numismatics$dropAtConnector((Object) connectorBlockEntity, remainder);
                     }
                 }
             }
         });
+    }
+
+    private static void numismatics$dropAtConnector(Object blockEntity, ItemStack remainder) {
+        try {
+            Level level = (Level) blockEntity.getClass()
+                .getMethod("getLevel")
+                .invoke(blockEntity);
+            net.minecraft.core.BlockPos position = (net.minecraft.core.BlockPos) blockEntity.getClass()
+                .getMethod("getBlockPos")
+                .invoke(blockEntity);
+            dropAtConnector(level, position.getCenter(), remainder);
+        } catch (ReflectiveOperationException | LinkageError exception) {
+            NumismaticsAeronauticsBridge.LOGGER.error(
+                "Could not return leftover items to the Docking Connector.",
+                exception
+            );
+        }
     }
 
     private static void numismatics$notifyUpdate(Object blockEntity) {
