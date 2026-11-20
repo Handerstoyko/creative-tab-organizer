@@ -21,8 +21,8 @@ Docking Connectors as buffered item or fluid targets for Create: Numismatics Sal
    The default mode is item sales; sneak-right-click switches between items and fluids.
 4. With the SalePoint item no longer sneaking, right-click the connector to select it.
 5. Place the SalePoint within the normal Numismatics target range.
-6. Configure the item/fluid filter and price, then supply stock through either end of
-   the connected Docking Connector pair.
+6. Empty both connector inventories/tanks before enabling the SalePoint, then configure
+   the filter and price and supply stock through either end of the connected pair.
 
 ## Transfer behavior
 
@@ -36,9 +36,10 @@ SalePoint fluid buffer. The fluid is inserted into the paired connector's tank o
 after a successful purchase.
 
 Each Docking Connector can be bound to one SalePoint resource type at a time because
-Numismatics exposes a single target behaviour slot per block entity. To sell both
-items and fluids at the same docking location, use two connector pairs (one pair
-configured for items and another pair configured for fluids).
+Numismatics exposes a single target behaviour slot per block entity. To sell items and
+fluids simultaneously through one connected pair, configure one endpoint for item sales
+and the opposite endpoint for fluid sales, then bind a separate SalePoint to each.
+Alternatively, use two independent connector pairs.
 
 Changing the mode is blocked while that connector is already bound to a SalePoint.
 Shift + right-click with a selected SalePoint item retains Numismatics' normal
