@@ -40,6 +40,27 @@ jobs:
           path.write_text(source)
           PY
 
+      - name: Fix block entity factory signature
+        working-directory: powergrid-vehicle-addon
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path("src/main/java/com/serhii/pgvehicleaddon/registry/ModContent.java")
+          source = path.read_text()
+          old = """            () -> BlockEntityType.Builder.of(
+                    AutomotiveAlternatorBlockEntity::new,
+                    AUTOMOTIVE_ALTERNATOR.get()
+            ).build(null));"""
+          new = """            () -> BlockEntityType.Builder.of(
+                    (pos, state) -> new AutomotiveAlternatorBlockEntity(
+                            ModContent.AUTOMOTIVE_ALTERNATOR_BE.get(), pos, state),
+                    AUTOMOTIVE_ALTERNATOR.get()
+            ).build(null));"""
+          if old not in source:
+              raise SystemExit("Block entity factory code was not found; refusing a blind patch")
+          path.write_text(source.replace(old, new, 1))
+          PY
+
       - name: Set up Java 21
         uses: actions/setup-java@v4
         with:
