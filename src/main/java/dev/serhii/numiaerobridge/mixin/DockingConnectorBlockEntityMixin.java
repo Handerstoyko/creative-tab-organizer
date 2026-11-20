@@ -66,7 +66,7 @@ public abstract class DockingConnectorBlockEntityMixin {
             protected void relinquishControlInternal(ISalepointState<ItemStack> state) {
                 underSalePointControl = false;
                 boundState = null;
-                connectorBlockEntity.notifyUpdate();
+                numismatics$notifyUpdate(connectorBlockEntity);
             }
 
             @Override
@@ -181,7 +181,7 @@ public abstract class DockingConnectorBlockEntityMixin {
         });
     }
 
-    private static void numiaerobridge$notifyUpdate(Object blockEntity) {
+    private static void numismatics$notifyUpdate(Object blockEntity) {
         try {
             blockEntity.getClass().getMethod("notifyUpdate").invoke(blockEntity);
         } catch (ReflectiveOperationException | LinkageError exception) {
