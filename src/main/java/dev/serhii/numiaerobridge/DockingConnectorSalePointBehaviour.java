@@ -405,7 +405,13 @@ public final class DockingConnectorSalePointBehaviour extends SalepointTargetBeh
 
     private void dropAtConnector(ItemStack stack) {
         if (stack.isEmpty()) return;
-        Level level = blockEntity.getLevel();
+        Level level;
+        try {
+            level = (Level) invoke(blockEntity, "getLevel");
+        } catch (ReflectiveOperationException exception) {
+            NumismaticsAeronauticsBridge.LOGGER.error("Could not find the level for an item refund.", exception);
+            return;
+        }
         if (!(level instanceof ServerLevel serverLevel)) return;
         Vec3 position = blockEntity.getBlockPos().getCenter();
         serverLevel.addFreshEntity(new ItemEntity(serverLevel, position.x, position.y, position.z, stack));
