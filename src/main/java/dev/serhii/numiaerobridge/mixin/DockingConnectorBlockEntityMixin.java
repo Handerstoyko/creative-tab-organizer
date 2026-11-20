@@ -84,6 +84,10 @@ public abstract class DockingConnectorBlockEntityMixin implements DockingConnect
         Object original = callback.getReturnValue();
         if (original == null) return;
 
+        // Leave the native connector inventory untouched unless an item SalePoint
+        // actively controls this connector pair. The proxy is only needed for sales.
+        if (numiaerobridge$getActiveSalePointState(false) == null) return;
+
         try {
             Class<?> containerInterface = Class.forName(ABSTRACT_CONTAINER);
             if (!containerInterface.isInstance(original)) return;

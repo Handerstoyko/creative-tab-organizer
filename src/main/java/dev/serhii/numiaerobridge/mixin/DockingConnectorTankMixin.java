@@ -43,10 +43,8 @@ public abstract class DockingConnectorTankMixin {
             // Fluid may be pumped into either connector. The pair resolves the SalePoint
             // on either end and captures the flow into that SalePoint's buffer.
             Object state = access.numiaerobridge$getActiveSalePointState(true);
-            if (state == null) {
-                callback.setReturnValue(0L);
-                return;
-            }
+            // No active fluid SalePoint: let Docking Connector perform its normal tank transfer.
+            if (state == null) return;
 
             Object buffer = state.getClass().getMethod("getBuffer").invoke(state);
             Object helper = getSingleTankWrapper();

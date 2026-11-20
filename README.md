@@ -26,6 +26,11 @@ Docking Connectors as buffered item or fluid targets for Create: Numismatics Sal
 
 ## Transfer behavior
 
+When no SalePoint is actively bound to the connector pair, both connector endpoints retain
+their native behavior: item inventory transfers and fluid tank transfers pass through normally.
+The addon only intercepts the matching resource channel while a SalePoint actively controls
+the pair. When that control is released, native connector transfer resumes.
+
 While an item SalePoint controls one end of the docked pair, incoming item insertions
 through either connector are captured by the SalePoint buffer. Automation cannot
 extract that buffered stock. Once a purchase succeeds, the purchased items are
