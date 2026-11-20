@@ -76,12 +76,11 @@ public abstract class DockingConnectorBlockEntityMixin implements DockingConnect
 
     /**
      * Simulated exposes the paired inventory through AbstractContainer. Keep the original
-     * container as the delegate, but route insertions into the SalePoint buffer while the
-     * SalePoint owns this connector. The SalePoint purchase path writes directly to the
-     * remote connector's local inventory and therefore bypasses this interception.
+     * container as the delegate, but route insertions into the active SalePoint buffer while
+     * either end of the docked pair is controlled by a SalePoint.
      */
     @Inject(method = "getInventory", at = @At("RETURN"), cancellable = true, remap = false)
-    private void numiaerobridge$wrapInventory(CallbackInfoReturnable<?> callback) {
+    private void numiaerobridge$wrapInventory(CallbackInfoReturnable callback) {
         Object original = callback.getReturnValue();
         if (original == null) return;
 
@@ -90,27 +89,26 @@ public abstract class DockingConnectorBlockEntityMixin implements DockingConnect
             if (!containerInterface.isInstance(original)) return;
 
             InvocationHandler handler = (proxy, method, args) -> {
-                if (numiaerobridge$isSalePointControlled()
-                    && !numiaerobridge$isFluidMode()
-                    && args != null) {
+                Object salePointState = numiaerobridge$getActiveSalePointState(false);
+                if (salePointState != null && args != null) {
                     String name = method.getName();
 
                     if ("insertGeneral".equals(name) && args.length == 3
                         && args[1] instanceof Integer amount
                         && args[2] instanceof Boolean simulate) {
-                        return numiaerobridge$insertIntoSalePointBuffer(args[0], amount, simulate);
+                        return numiaerobridge$insertIntoSalePointBuffer(salePointState, args[0], amount, simulate);
                     }
 
                     if ("insertSlot".equals(name) && args.length == 3
                         && args[0] instanceof ItemStack stack
                         && args[2] instanceof Boolean simulate) {
-                        int inserted = numiaerobridge$copyToSalePointBuffer(stack, simulate);
+                        int inserted = numiaerobridge$copyToSalePointBuffer(salePointState, stack, simulate);
                         ItemStack remainder = stack.copy();
                         remainder.shrink(inserted);
                         return remainder;
                     }
 
-                    // Do not let another inventory pull unpurchased stock out of this port.
+                    // Stock must not be extracted by automation before a successful purchase.
                     if ("extractGeneral".equals(name)) return 0;
                     if ("extractSlot".equals(name)) return ItemStack.EMPTY;
                 }
@@ -156,9 +154,7 @@ public abstract class DockingConnectorBlockEntityMixin implements DockingConnect
     @Override
     public boolean numiaerobridge$isSalePointControlled() {
         return numiaerobridge$salePointBehaviour != null
-            && numiaerobridge$salePointBehaviour.isControlledBySalepoint()
-            && (numiaerobridge$salePointBehaviour.isItemSaleActive()
-                || numiaerobridge$salePointBehaviour.isFluidSaleActive());
+            && numiaerobridge$salePointBehaviour.isControlledBySalepoint();
     }
 
     @Override
@@ -168,23 +164,55 @@ public abstract class DockingConnectorBlockEntityMixin implements DockingConnect
             : numiaerobridge$salePointBehaviour.getBoundState();
     }
 
+    @Override
+    public Object numiaerobridge$getLocalSalePointState(boolean fluidMode) {
+        if (numiaerobridge$salePointBehaviour == null
+            || !numiaerobridge$isSalePointControlled()
+            || numiaerobridge$fluidMode != fluidMode) {
+            return null;
+        }
+
+        if (fluidMode && !numiaerobridge$salePointBehaviour.isFluidSaleActive()) return null;
+        if (!fluidMode && !numiaerobridge$salePointBehaviour.isItemSaleActive()) return null;
+        return numiaerobridge$getBoundState();
+    }
+
+    @Override
+    public Object numiaerobridge$getActiveSalePointState(boolean fluidMode) {
+        Object local = numiaerobridge$getLocalSalePointState(fluidMode);
+        if (local != null) return local;
+
+        try {
+            Object peer = ((Object) this).getClass().getMethod("getOtherConnector").invoke(this);
+            if (peer instanceof DockingConnectorSalePointAccess access) {
+                return access.numiaerobridge$getLocalSalePointState(fluidMode);
+            }
+        } catch (ReflectiveOperationException | LinkageError exception) {
+            NumismaticsAeronauticsBridge.LOGGER.debug(
+                "Could not inspect the paired Docking Connector for an active SalePoint.",
+                exception
+            );
+        }
+        return null;
+    }
+
     @Unique
-    private int numiaerobridge$insertIntoSalePointBuffer(Object itemInfo, int amount, boolean simulate)
-        throws ReflectiveOperationException {
+    private int numiaerobridge$insertIntoSalePointBuffer(
+        Object state,
+        Object itemInfo,
+        int amount,
+        boolean simulate
+    ) throws ReflectiveOperationException {
         Class<?> infoClass = Class.forName(ITEM_INFO_WRAPPER);
         Object stackObject = infoClass.getMethod("generateFromInfo", infoClass).invoke(null, itemInfo);
         if (!(stackObject instanceof ItemStack stack) || stack.isEmpty()) return 0;
         stack.setCount(amount);
-        return numiaerobridge$copyToSalePointBuffer(stack, simulate);
+        return numiaerobridge$copyToSalePointBuffer(state, stack, simulate);
     }
 
     @Unique
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    private int numiaerobridge$copyToSalePointBuffer(ItemStack stack, boolean simulate)
+    private int numiaerobridge$copyToSalePointBuffer(Object state, ItemStack stack, boolean simulate)
         throws ReflectiveOperationException {
-        Object state = numiaerobridge$getBoundState();
-        if (state == null) return 0;
-
         Object buffer = state.getClass().getMethod("getBuffer").invoke(state);
         Method copy = buffer.getClass().getMethod("copyToBuffer", Object.class, boolean.class);
         int inserted = ((Number) copy.invoke(buffer, stack, simulate)).intValue();
