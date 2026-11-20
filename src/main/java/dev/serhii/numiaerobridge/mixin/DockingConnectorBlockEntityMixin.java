@@ -58,7 +58,7 @@ public abstract class DockingConnectorBlockEntityMixin {
                 boundState = state;
                 if (!underSalePointControl) {
                     underSalePointControl = true;
-                    numiaerobridge$notifyUpdate(connectorBlockEntity);
+                    numismatics$notifyUpdate(connectorBlockEntity);
                 }
             }
 
