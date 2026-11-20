@@ -1,7 +1,7 @@
 # Numismatics Aeronautics Bridge
 
-A small NeoForge addon for Minecraft 1.21.1 that exposes the Create Aeronautics
-(Simulated) Docking Connector as an item target for Create: Numismatics SalePoints.
+A NeoForge addon for Minecraft 1.21.1 that exposes Create Aeronautics (Simulated)
+Docking Connectors as buffered item or fluid targets for Create: Numismatics SalePoints.
 
 ## Requirements
 
@@ -13,15 +13,35 @@ A small NeoForge addon for Minecraft 1.21.1 that exposes the Create Aeronautics
 - Create Aeronautics bundle (includes the Simulated module)
 - Sable, as required by Create Aeronautics
 
-## How to use
+## Setup
 
-1. Place and extend two Docking Connectors so they lock together.
-2. Hold the Numismatics SalePoint block item and right-click the Docking Connector
-   that should receive purchased items.
-3. Place the SalePoint within the normal Numismatics target range.
-4. Configure the item filter and price, then stock the SalePoint.
-5. A purchase is accepted only while both Docking Connectors report a locked link.
-   The sold items are inserted into the paired Docking Connector's inventory.
+1. Place and extend two Docking Connectors so that they lock together.
+2. Take a fresh SalePoint block item (one without a target selected).
+3. Sneak-right-click a Docking Connector with that SalePoint item to switch its mode.
+   The default mode is item sales; sneak-right-click switches between items and fluids.
+4. With the SalePoint item no longer sneaking, right-click the connector to select it.
+5. Place the SalePoint within the normal Numismatics target range.
+6. Configure the item/fluid filter and price, then supply stock through either end of
+   the connected Docking Connector pair.
 
-The addon does not add blocks or change docking physics; it adds the Numismatics
-target behaviour to the existing Docking Connector block entity.
+## Transfer behavior
+
+While an item SalePoint controls one end of the docked pair, incoming item insertions
+through either connector are captured by the SalePoint buffer. Automation cannot
+extract that buffered stock. Once a purchase succeeds, the purchased items are
+inserted into the paired connector's receiving inventory.
+
+In fluid mode, incoming fluid transfers through either end are redirected into the
+SalePoint fluid buffer. The fluid is inserted into the paired connector's tank only
+after a successful purchase.
+
+Each Docking Connector can be bound to one SalePoint resource type at a time because
+Numismatics exposes a single target behaviour slot per block entity. To sell both
+items and fluids at the same docking location, use two connector pairs (one pair
+configured for items and another pair configured for fluids).
+
+Changing the mode is blocked while that connector is already bound to a SalePoint.
+Shift + right-click with a selected SalePoint item retains Numismatics' normal
+clear-selection behavior.
+
+The addon does not add blocks or change docking physics.
