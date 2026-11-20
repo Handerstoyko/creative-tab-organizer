@@ -108,9 +108,6 @@ public abstract class DockingConnectorBlockEntityMixin implements DockingConnect
                         return remainder;
                     }
 
-                    // Stock must not be extracted by automation before a successful purchase.
-                    if ("extractGeneral".equals(name)) return 0;
-                    if ("extractSlot".equals(name)) return ItemStack.EMPTY;
                 }
 
                 try {
