@@ -79,3 +79,12 @@ tasks.withType(JavaCompile).configureEach {
     // All target access is remapped=false and performed by string/reflection.
     options.compilerArgs.add("-proc:none")
 }
+
+tasks.named("jar", Jar).configure {
+    manifest {
+        attributes(
+            "Implementation-Version": project.version,
+            "Specification-Version": project.version
+        )
+    }
+}
