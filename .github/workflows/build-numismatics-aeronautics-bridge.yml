@@ -40,8 +40,11 @@ jobs:
           jar tf "$jar_file" | grep -q 'META-INF/neoforge.mods.toml'
           jar tf "$jar_file" | grep -q 'numiaerobridge.mixins.json'
           jar tf "$jar_file" | grep -q 'DockingConnectorBlockEntityMixin.class'
+          jar tf "$jar_file" | grep -q 'DockingConnectorTankMixin.class'
+          jar tf "$jar_file" | grep -q 'SalepointBlockItemMixin.class'
+          jar tf "$jar_file" | grep -q 'DockingConnectorSalePointBehaviour.class'
           mkdir -p dist
-          cp "$jar_file" dist/Numismatics-Aeronautics-Bridge-0.1.0.jar
+          cp "$jar_file" dist/Numismatics-Aeronautics-Bridge-0.2.0.jar
           sha256sum dist/Numismatics-Aeronautics-Bridge-0.1.0.jar | tee dist/SHA256SUMS.txt
 
       - name: Upload test build
