@@ -174,7 +174,20 @@ public abstract class DockingConnectorBlockEntityMixin {
                     }
 
                     if (!remainder.isEmpty()) {
-                        dropAtConnector(connectorBlockEntity.getLevel(), connectorBlockEntity.getBlockPos().getCenter(), remainder);
+                        try {
+                            Level level = (Level) connectorBlockEntity.getClass()
+                                .getMethod("getLevel")
+                                .invoke(connectorBlockEntity);
+                            net.minecraft.core.BlockPos position = (net.minecraft.core.BlockPos) connectorBlockEntity.getClass()
+                                .getMethod("getBlockPos")
+                                .invoke(connectorBlockEntity);
+                            dropAtConnector(level, position.getCenter(), remainder);
+                        } catch (ReflectiveOperationException | LinkageError exception) {
+                            NumismaticsAeronauticsBridge.LOGGER.error(
+                                "Could not return leftover items to the Docking Connector.",
+                                exception
+                            );
+                        }
                     }
                 }
             }
