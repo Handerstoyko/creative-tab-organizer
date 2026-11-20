@@ -8,8 +8,8 @@ version = "${file.jarVersion}"
 displayName = "Numismatics Aeronautics Bridge"
 authors = "Serhii"
 description = '''
-Allows Create: Numismatics SalePoints to use Aeronautics Docking Connectors
-as item sale targets. Items are transferred to the paired connector inventory.
+Adds buffered item and fluid SalePoint interfaces to Create Aeronautics Docking Connectors.
+Incoming stock is held by the SalePoint until the purchase is completed.
 '''
 
 [[mixins]]
