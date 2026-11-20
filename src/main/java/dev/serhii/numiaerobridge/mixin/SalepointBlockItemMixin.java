@@ -1,6 +1,7 @@
 package dev.serhii.numiaerobridge.mixin;
 
 import dev.serhii.numiaerobridge.DockingConnectorSalePointAccess;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -30,7 +31,7 @@ public abstract class SalepointBlockItemMixin {
         if (player == null || !player.isShiftKeyDown()) return;
 
         ItemStack stack = context.getItemInHand();
-        if (stack.hasTag()) return;
+        if (stack.has(DataComponents.CUSTOM_DATA)) return;
 
         Level level = context.getLevel();
         if (!(level.getBlockEntity(context.getClickedPos()) instanceof DockingConnectorSalePointAccess access)) {
