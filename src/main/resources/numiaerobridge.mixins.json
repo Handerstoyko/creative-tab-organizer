@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "dev.serhii.numiaerobridge.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "DockingConnectorBlockEntityMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

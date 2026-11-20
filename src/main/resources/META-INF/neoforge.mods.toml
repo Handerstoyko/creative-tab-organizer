@@ -1,0 +1,51 @@
+modLoader = "javafml"
+loaderVersion = "[4,)"
+license = "MIT"
+
+[[mods]]
+modId = "numiaerobridge"
+version = "${file.jarVersion}"
+displayName = "Numismatics Aeronautics Bridge"
+authors = "Serhii"
+description = '''
+Allows Create: Numismatics SalePoints to use Aeronautics Docking Connectors
+as item sale targets. Items are transferred to the paired connector inventory.
+'''
+
+[[mixins]]
+config = "numiaerobridge.mixins.json"
+
+[[dependencies.numiaerobridge]]
+modId = "neoforge"
+type = "required"
+versionRange = "[21.1.247,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.numiaerobridge]]
+modId = "minecraft"
+type = "required"
+versionRange = "[1.21.1]"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.numiaerobridge]]
+modId = "create"
+type = "required"
+versionRange = "[6.0.10,)"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.numiaerobridge]]
+modId = "numismatics"
+type = "required"
+versionRange = "[1.1.0,)"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.numiaerobridge]]
+modId = "simulated"
+type = "required"
+versionRange = "[1.0.0,)"
+ordering = "AFTER"
+side = "BOTH"

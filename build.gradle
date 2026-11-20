@@ -1,0 +1,84 @@
+plugins {
+    id "java"
+    id "net.neoforged.moddev" version "2.0.140"
+}
+
+group = "dev.serhii.numiaerobridge"
+version = "0.1.0"
+
+base {
+    archivesName = "Numismatics-Aeronautics-Bridge"
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(21)
+}
+
+repositories {
+    mavenCentral()
+
+    maven {
+        name = "Create"
+        url = "https://maven.createmod.net"
+    }
+
+    maven {
+        name = "Sponge"
+        url = "https://repo.spongepowered.org/repository/maven-public/"
+    }
+
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Modrinth"
+                url = "https://api.modrinth.com/maven"
+            }
+        }
+        filter {
+            includeGroup "maven.modrinth"
+        }
+    }
+}
+
+neoForge {
+    version = neoforge_version
+
+    parchment {
+        minecraftVersion = minecraft_version
+        mappingsVersion = "2024.11.10"
+    }
+
+    runs {
+        client {
+            client()
+        }
+        server {
+            server()
+            programArgument "--nogui"
+        }
+    }
+
+    mods {
+        numiaerobridge {
+            sourceSet sourceSets.main
+        }
+    }
+}
+
+dependencies {
+    // Create API
+    compileOnly("com.simibubi.create:create-${minecraft_version}:${create_version}:slim") {
+        transitive = false
+    }
+
+    // Numismatics API (mod is still installed separately in the game)
+    compileOnly("maven.modrinth:Jdbbtt0i:${numismatics_version_id}")
+
+    // Mixin annotations and processor for the Docking Connector integration
+    compileOnly("org.spongepowered:mixin:0.8.5")
+    annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = "UTF-8"
+}
