@@ -36,13 +36,13 @@ public abstract class DockingConnectorTankMixin {
     ) {
         try {
             Object owner = getField(this, "blockEntity");
-            if (!(owner instanceof DockingConnectorSalePointAccess access)
-                || !access.numiaerobridge$isSalePointControlled()
-                || !access.numiaerobridge$isFluidMode()) {
+            if (!(owner instanceof DockingConnectorSalePointAccess access)) {
                 return;
             }
 
-            Object state = access.numiaerobridge$getBoundState();
+            // Fluid may be pumped into either connector. The pair resolves the SalePoint
+            // on either end and captures the flow into that SalePoint's buffer.
+            Object state = access.numiaerobridge$getActiveSalePointState(true);
             if (state == null) {
                 callback.setReturnValue(0L);
                 return;
