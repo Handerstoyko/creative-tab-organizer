@@ -47,17 +47,10 @@ jobs:
           from pathlib import Path
           path = Path("src/main/java/com/serhii/pgvehicleaddon/registry/ModContent.java")
           source = path.read_text()
-          old = """            () -> BlockEntityType.Builder.of(
-                    AutomotiveAlternatorBlockEntity::new,
-                    AUTOMOTIVE_ALTERNATOR.get()
-            ).build(null));"""
-          new = """            () -> BlockEntityType.Builder.of(
-                    (pos, state) -> new AutomotiveAlternatorBlockEntity(
-                            ModContent.AUTOMOTIVE_ALTERNATOR_BE.get(), pos, state),
-                    AUTOMOTIVE_ALTERNATOR.get()
-            ).build(null));"""
+          old = "                    AutomotiveAlternatorBlockEntity::new,"
+          new = "                    (pos, state) -> new AutomotiveAlternatorBlockEntity(" + chr(10) + "                            ModContent.AUTOMOTIVE_ALTERNATOR_BE.get(), pos, state),"
           if old not in source:
-              raise SystemExit("Block entity factory code was not found; refusing a blind patch")
+              raise SystemExit("Block entity constructor reference was not found; refusing a blind patch")
           path.write_text(source.replace(old, new, 1))
           PY
 
