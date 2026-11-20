@@ -138,6 +138,7 @@ public final class DockingConnectorSalePointBehaviour extends SalepointTargetBeh
         if (extracted.isEmpty()) return false;
 
         Object receiverInventory = null;
+        int insertedTotal = 0;
         try {
             Object receiver = getLockedPeer();
             if (receiver == null) {
@@ -147,7 +148,6 @@ public final class DockingConnectorSalePointBehaviour extends SalepointTargetBeh
 
             receiverInventory = getField(receiver, "inventory");
             invoke(receiverInventory, "dock");
-            int insertedTotal = 0;
 
             for (Object entry : extracted) {
                 if (!(entry instanceof ItemStack stack) || stack.isEmpty()) {
@@ -169,7 +169,7 @@ public final class DockingConnectorSalePointBehaviour extends SalepointTargetBeh
             NumismaticsAeronauticsBridge.LOGGER.error(
                 "Docking Connector item purchase failed; returning stock to the SalePoint.", exception);
             if (receiverInventory != null) {
-                rollbackItems(receiverInventory, extracted, 0);
+                rollbackItems(receiverInventory, extracted, insertedTotal);
             } else {
                 refundItems(extracted);
             }
