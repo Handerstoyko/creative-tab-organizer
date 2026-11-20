@@ -43,11 +43,6 @@ repositories {
 neoForge {
     version = neoforge_version
 
-    parchment {
-        minecraftVersion = minecraft_version
-        mappingsVersion = "2024.11.10"
-    }
-
     runs {
         client {
             client()
