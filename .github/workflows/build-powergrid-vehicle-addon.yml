@@ -33,13 +33,11 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           path = Path("build.gradle")
-          text = path.read_text()
-          anchor = "    maven { url = 'https://maven.createmod.net' }\\n"
-          if "https://maven.architectury.dev/" not in text:
-              if anchor not in text:
-                  raise SystemExit("Could not find repository insertion point")
-              text = text.replace(anchor, anchor + "    maven { url = 'https://maven.architectury.dev/' }\\n", 1)
-          path.write_text(text)
+          source = path.read_text()
+          anchor = next(line for line in source.splitlines() if "maven.createmod.net" in line)
+          if "maven.architectury.dev" not in source:
+              source = source.replace(anchor, anchor + chr(10) + "    maven { url = 'https://maven.architectury.dev/' }", 1)
+          path.write_text(source)
           PY
 
       - name: Set up Java 21
