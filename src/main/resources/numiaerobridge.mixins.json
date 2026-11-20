@@ -4,7 +4,9 @@
   "package": "dev.serhii.numiaerobridge.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "DockingConnectorBlockEntityMixin"
+    "DockingConnectorBlockEntityMixin",
+    "DockingConnectorTankMixin",
+    "SalepointBlockItemMixin"
   ],
   "injectors": {
     "defaultRequire": 1
