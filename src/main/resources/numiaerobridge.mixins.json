@@ -6,7 +6,8 @@
   "mixins": [
     "DockingConnectorBlockEntityMixin",
     "DockingConnectorTankMixin",
-    "SalepointBlockItemMixin"
+    "SalepointBlockItemMixin",
+    "SalepointBlockEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1

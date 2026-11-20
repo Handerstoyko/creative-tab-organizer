@@ -24,6 +24,12 @@ Docking Connectors as buffered item or fluid targets for Create: Numismatics Sal
 6. Empty both connector inventories/tanks before enabling the SalePoint, then configure
    the filter and price and supply stock through either end of the connected pair.
 
+## Ponder
+
+The Docking Connector Ponder page includes the SalePoint integration: native transfer when
+unbound, switching between item/fluid sale modes, selecting the connector as a target,
+and buffering stock until payment is completed.
+
 ## Transfer behavior
 
 When no SalePoint is actively bound to the connector pair, both connector endpoints retain
