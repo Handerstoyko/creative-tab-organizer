@@ -413,7 +413,12 @@ public final class DockingConnectorSalePointBehaviour extends SalepointTargetBeh
             return;
         }
         if (!(level instanceof ServerLevel serverLevel)) return;
-        Vec3 position = blockEntity.getBlockPos().getCenter();
-        serverLevel.addFreshEntity(new ItemEntity(serverLevel, position.x, position.y, position.z, stack));
+        try {
+            net.minecraft.core.BlockPos blockPos = (net.minecraft.core.BlockPos) invoke(blockEntity, "getBlockPos");
+            Vec3 position = blockPos.getCenter();
+            serverLevel.addFreshEntity(new ItemEntity(serverLevel, position.x, position.y, position.z, stack));
+        } catch (ReflectiveOperationException exception) {
+            NumismaticsAeronauticsBridge.LOGGER.error("Could not find the connector position for an item refund.", exception);
+        }
     }
 }
