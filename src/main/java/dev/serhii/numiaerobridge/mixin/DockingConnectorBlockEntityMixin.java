@@ -58,7 +58,7 @@ public abstract class DockingConnectorBlockEntityMixin {
                 boundState = state;
                 if (!underSalePointControl) {
                     underSalePointControl = true;
-                    connectorBlockEntity.notifyUpdate();
+                    numiaerobridge$notifyUpdate(connectorBlockEntity);
                 }
             }
 
@@ -179,6 +179,17 @@ public abstract class DockingConnectorBlockEntityMixin {
                 }
             }
         });
+    }
+
+    private static void numiaerobridge$notifyUpdate(Object blockEntity) {
+        try {
+            blockEntity.getClass().getMethod("notifyUpdate").invoke(blockEntity);
+        } catch (ReflectiveOperationException | LinkageError exception) {
+            NumismaticsAeronauticsBridge.LOGGER.error(
+                "Could not send a Docking Connector block update.",
+                exception
+            );
+        }
     }
 
     /**
