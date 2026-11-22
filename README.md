@@ -26,9 +26,14 @@ Docking Connectors as buffered item or fluid targets for Create: Numismatics Sal
 
 ## Ponder
 
-The Docking Connector Ponder page includes the SalePoint integration: native transfer when
-unbound, switching between item/fluid sale modes, selecting the connector as a target,
-and buffering stock until payment is completed.
+The Docking Connector Ponder page includes three focused tutorials:
+- **Basics:** native transfer behaviour of a docked connector pair.
+- **Item sales:** selecting the SalePoint target, buffering stock, and delivery after payment.
+- **Fluid sales:** switching to fluid mode, buffering incoming fluid, and delivering the
+  requested amount after payment, including orders larger than 1 litre.
+
+The connector's animated pistons and docking feet are initialized explicitly in the
+Ponder scene so its block-entity-rendered parts remain visible.
 
 ## Transfer behavior
 
