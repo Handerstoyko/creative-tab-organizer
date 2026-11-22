@@ -170,7 +170,6 @@ public final class DockingConnectorSalePointScenes {
         CreateSceneBuilder scene = new CreateSceneBuilder(builder);
         scene.title(id, title);
         scene.configureBasePlate(0, 0, 7);
-        scene.setSceneOffsetY(-0.5f);
         scene.scaleSceneView(0.85f);
         scene.showBasePlate();
         scene.idle(5);
@@ -234,7 +233,8 @@ public final class DockingConnectorSalePointScenes {
 
     private static void showPair(CreateSceneBuilder scene, SceneBuildingUtil util,
                                  BlockPos left, BlockPos right) {
-        scene.world().showSection(util.select().layer(0), Direction.UP);
+        // Reveal the complete configured base plate explicitly before the machines.
+        scene.world().showSection(util.select().fromTo(0, 0, 0, 7, 0, 7), Direction.UP);
         scene.idle(5);
         scene.world().showSection(util.select().position(left), Direction.DOWN);
         scene.idle(5);
