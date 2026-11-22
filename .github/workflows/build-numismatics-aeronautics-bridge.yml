@@ -45,18 +45,18 @@ jobs:
           jar tf "$jar_file" | grep -q 'SalepointBlockEntityMixin.class'
           jar tf "$jar_file" | grep -q 'DockingConnectorSalePointPonderPlugin.class'
           jar tf "$jar_file" | grep -q 'DockingConnectorSalePointScenes.class'
-          jar tf "$jar_file" | grep -q 'data/numiaerobridge/ponder/docking_connector/basics.nbt'
-          jar tf "$jar_file" | grep -q 'data/numiaerobridge/ponder/docking_connector/item_sale.nbt'
-          jar tf "$jar_file" | grep -q 'data/numiaerobridge/ponder/docking_connector/fluid_sale.nbt'
+          jar tf "$jar_file" | grep -q 'assets/numiaerobridge/ponder/docking_connector/basics.nbt'
+          jar tf "$jar_file" | grep -q 'assets/numiaerobridge/ponder/docking_connector/item_sale.nbt'
+          jar tf "$jar_file" | grep -q 'assets/numiaerobridge/ponder/docking_connector/fluid_sale.nbt'
           jar tf "$jar_file" | grep -q 'DockingConnectorSalePointBehaviour.class'
           mkdir -p dist
-          cp "$jar_file" dist/Numismatics-Aeronautics-Bridge-0.2.9.jar
-          sha256sum dist/Numismatics-Aeronautics-Bridge-0.2.9.jar | tee dist/SHA256SUMS.txt
+          cp "$jar_file" dist/Numismatics-Aeronautics-Bridge-0.2.10.jar
+          sha256sum dist/Numismatics-Aeronautics-Bridge-0.2.10.jar | tee dist/SHA256SUMS.txt
 
       - name: Upload test build
         uses: actions/upload-artifact@v4
         with:
-          name: Numismatics-Aeronautics-Bridge-0.2.9
+          name: Numismatics-Aeronautics-Bridge-0.2.10
           path: dist/*
           if-no-files-found: error
           retention-days: 14
