@@ -233,13 +233,13 @@ public final class DockingConnectorSalePointScenes {
 
     private static void showPair(CreateSceneBuilder scene, SceneBuildingUtil util,
                                  BlockPos left, BlockPos right) {
-        // Reveal the complete configured base plate explicitly before the machines.
-        scene.world().showSection(util.select().fromTo(0, 0, 0, 7, 0, 7), Direction.UP);
+        // Follow Create's standard Ponder reveal order: base layer first, then
+        // every schematic block above it. This prevents a blank scene when
+        // individual block sections are not part of the initial world section.
+        scene.world().showSection(util.select().layer(0), Direction.UP);
         scene.idle(5);
-        scene.world().showSection(util.select().position(left), Direction.DOWN);
-        scene.idle(5);
-        scene.world().showSection(util.select().position(right), Direction.DOWN);
-        scene.idle(12);
+        scene.world().showSection(util.select().layersFrom(1), Direction.DOWN);
+        scene.idle(20);
         scene.overlay().showLine(PonderPalette.GREEN,
             util.vector().centerOf(left), util.vector().centerOf(right), 45);
         scene.idle(10);

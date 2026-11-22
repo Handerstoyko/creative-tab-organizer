@@ -1,0 +1,19 @@
+{
+  "numiaerobridge.ponder.header": "Docking Connector",
+  "numiaerobridge.ponder.docking_connector_basics.header": "Docking Connector basics",
+  "numiaerobridge.ponder.docking_connector_basics.text_1": "A docked pair acts as one connection while both connector inventories and tanks remain independent.",
+  "numiaerobridge.ponder.docking_connector_basics.text_2": "Without a SalePoint bound, items and fluids pass through the pair using the normal connector behaviour.",
+  "numiaerobridge.ponder.docking_connector_item_sale.header": "Selling items through a SalePoint",
+  "numiaerobridge.ponder.docking_connector_item_sale.text_1": "Start with a fresh SalePoint item. Sneak-right-click a connector to switch its resource mode.",
+  "numiaerobridge.ponder.docking_connector_item_sale.text_2": "Right-click the connector with the selected SalePoint item to bind that connector pair as its target.",
+  "numiaerobridge.ponder.docking_connector_item_sale.text_3": "While the SalePoint controls the pair, incoming items are stored in its buffer. They are not delivered to the buyer yet.",
+  "numiaerobridge.ponder.docking_connector_item_sale.text_4": "The order is completed only after payment succeeds. The purchased quantity is then inserted into the opposite connector.",
+  "numiaerobridge.ponder.docking_connector_item_sale.text_5": "When the SalePoint is unbound, the pair returns to normal item transfer.",
+  "numiaerobridge.ponder.docking_connector_fluid_sale.header": "Selling fluids through a SalePoint",
+  "numiaerobridge.ponder.docking_connector_fluid_sale.text_1": "Use a fresh SalePoint item and sneak-right-click a connector to switch from item sales to fluid sales.",
+  "numiaerobridge.ponder.docking_connector_fluid_sale.text_2": "Right-click the connector again with the SalePoint item to select the pair as the sale target.",
+  "numiaerobridge.ponder.docking_connector_fluid_sale.text_3": "Incoming fluid is redirected into the SalePoint buffer. The connected connector tank does not receive it before payment.",
+  "numiaerobridge.ponder.docking_connector_fluid_sale.text_4": "After successful payment, only the ordered fluid amount is delivered to the opposite connector tank.",
+  "numiaerobridge.ponder.docking_connector_fluid_sale.text_5": "Orders larger than 1 litre are supported. The SalePoint still delivers the requested amount only after payment.",
+  "numiaerobridge.ponder.docking_connector_fluid_sale.text_6": "Unbinding the SalePoint restores normal fluid transfer between the connectors."
+}
