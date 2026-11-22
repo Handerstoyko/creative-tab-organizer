@@ -205,7 +205,15 @@ public final class DockingConnectorSalePointBehaviour extends SalepointTargetBeh
                 totalAmount += fluid.getAmount();
             }
 
-            if (commonType == null || calculateTankInsert(destinationTank, commonType, totalAmount) != totalAmount) {
+            if (commonType == null) {
+                refundFluids(extracted);
+                return false;
+            }
+
+            // Aeronautics constructs DockingConnectorTank with a 1000 mB capacity.
+            // Grow only the destination tank needed for this paid SalePoint transfer.
+            ensureTankCapacity(destinationTank, totalAmount);
+            if (calculateTankInsert(destinationTank, commonType, totalAmount) != totalAmount) {
                 refundFluids(extracted);
                 return false;
             }
@@ -240,6 +248,7 @@ public final class DockingConnectorSalePointBehaviour extends SalepointTargetBeh
         if (receiver == null) return 0;
         Object destinationTank = getField(receiver, "tank");
         Object type = toConnectorFluidType(fluid);
+        ensureTankCapacity(destinationTank, fluid.getAmount());
         return calculateTankInsert(destinationTank, type, fluid.getAmount());
     }
 
@@ -359,6 +368,34 @@ public final class DockingConnectorSalePointBehaviour extends SalepointTargetBeh
         throw new NoSuchMethodException("No Simulated SingleTankWrapper.toCType implementation was found.");
     }
 
+    /**
+     * Ensures a SalePoint order can fit in the Docking Connector tank.
+     *
+     * Aeronautics' DockingConnectorTank calls super(1000), while SingleTank stores
+     * the converted capacity in a final instance field. We deliberately update that
+     * field only on the paid-delivery path, rather than modifying a constructor
+     * constant (which caused a verifier error on Java 21).
+     */
+    private static void ensureTankCapacity(Object tank, long incomingAmount)
+        throws ReflectiveOperationException {
+        if (incomingAmount <= 0) return;
+
+        Field capacityField = findField(tank, "capacity");
+        Field amountField = findField(tank, "amount");
+        capacityField.setAccessible(true);
+        amountField.setAccessible(true);
+
+        long currentCapacity = capacityField.getLong(tank);
+        long currentAmount = amountField.getLong(tank);
+        long requiredCapacity = currentAmount > Long.MAX_VALUE - incomingAmount
+            ? Long.MAX_VALUE
+            : currentAmount + incomingAmount;
+
+        if (requiredCapacity > currentCapacity) {
+            capacityField.setLong(tank, requiredCapacity);
+        }
+    }
+
     private static long calculateTankInsert(Object tank, Object type, long amount)
         throws ReflectiveOperationException {
         Class<?> singleTank = Class.forName(SINGLE_TANK);
@@ -373,18 +410,22 @@ public final class DockingConnectorSalePointBehaviour extends SalepointTargetBeh
         method.invoke(null, tank, type, amount);
     }
 
-    private static Object getField(Object target, String name) throws ReflectiveOperationException {
+    private static Field findField(Object target, String name) throws NoSuchFieldException {
         Class<?> type = target.getClass();
         while (type != null) {
             try {
-                Field field = type.getDeclaredField(name);
-                field.setAccessible(true);
-                return field.get(target);
+                return type.getDeclaredField(name);
             } catch (NoSuchFieldException exception) {
                 type = type.getSuperclass();
             }
         }
         throw new NoSuchFieldException(name);
+    }
+
+    private static Object getField(Object target, String name) throws ReflectiveOperationException {
+        Field field = findField(target, name);
+        field.setAccessible(true);
+        return field.get(target);
     }
 
     private static Object invoke(Object target, String name) throws ReflectiveOperationException {
