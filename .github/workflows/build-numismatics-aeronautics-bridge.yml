@@ -52,7 +52,14 @@ jobs:
           cp "$jar_file" dist/Numismatics-Aeronautics-Bridge-0.2.11.jar
           sha256sum dist/Numismatics-Aeronautics-Bridge-0.2.11.jar | tee dist/SHA256SUMS.txt
 
-      - name: Upload test build
+      - name: Package module source only
+        shell: bash
+        run: |
+          set -euo pipefail
+          zip -r dist/Numismatics-Aeronautics-Bridge-0.2.11-source.zip \
+            build.gradle gradle.properties settings.gradle README.md src
+
+      - name: Upload test build and source
         uses: actions/upload-artifact@v4
         with:
           name: Numismatics-Aeronautics-Bridge-0.2.11
