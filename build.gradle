@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "dev.serhii.numiaerobridge"
-version = "0.2.10"
+version = "0.2.11"
 
 base {
     archivesName = "Numismatics-Aeronautics-Bridge"
@@ -68,9 +68,6 @@ dependencies {
 
     // Numismatics API (mod is still installed separately in the game)
     compileOnly("maven.modrinth:Jdbbtt0i:${numismatics_version_id}")
-
-    // Ponder API for the Docking Connector tutorial page
-    compileOnly("net.createmod.ponder:ponder-neoforge:${ponder_version}+mc${minecraft_version}")
 
     // Mixin annotations and processor for the Docking Connector integration
     compileOnly("org.spongepowered:mixin:0.8.5")
